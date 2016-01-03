@@ -1,3 +1,15 @@
+<?php
+try {
+     $db = new PDO("mysql:host=localhost;dbname=todo;charset=utf8", "root", "");
+} catch ( PDOException $e ){
+     print $e->getMessage();
+}
+function make_safe($deger) 
+{
+   $deger = strip_tags(mysql_real_escape_string(trim($deger)));
+   return $deger; 
+}
+?>
 <!DOCTYPE html>
 <html lang="tr">
   <head>
@@ -52,7 +64,42 @@
 
           <div class="inner cover">
             <h1 class="cover-heading">New Todo</h1>
-            <form class="form-horizontal ">
+          <?php
+          if ($_POST){
+            if (isset($_POST["title"])){
+              $title=make_safe($_POST["title"]);
+            }
+            if (isset($_POST["content"])){
+              $content=make_safe($_POST["content"]);
+            }
+            $query = $db->prepare("INSERT INTO list SET title = ?, content = ?");
+            $insert = $query->execute(array($title, $content));
+            if ( $insert ){
+                $last_id = $db->lastInsertId();
+                print '
+                <div class="alert alert-info alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                  ×
+                </button>
+                <h4>
+                  Başarılı!
+                </h4> <strong>İşlem Başarılı!</strong> Veritabanına kayıt işlemi gerçekleştirildi.
+              </div>';
+            }
+            else{
+              print '
+                <div class="alert alert-warning alert-dismissable">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                  ×
+                </button>
+                <h4>
+                  Hata!
+                </h4> <strong>İşlem Başarısız!</strong> Veritabanına kayıt işlemi sırasında hata oluştu. Tekrar Deneyiniz.
+              </div>';
+            }
+          }else{
+          ?>
+            <form class="form-horizontal" action="#" method="post">
               <fieldset>
               <!-- Form Name -->
               
@@ -60,7 +107,7 @@
               <div class="form-group">
                 <label class="col-md-4 control-label" for="title">Başlık</label>  
                 <div class="col-md-5">
-                <input id="title" name="title" type="text" placeholder="" class="form-control input-md">
+                <input id="title" name="title" type="text" placeholder="" class="form-control input-md" required>
                   
                 </div>
               </div>
@@ -69,7 +116,7 @@
               <div class="form-group">
                 <label class="col-md-4 control-label" for="content">İçerik</label>
                 <div class="col-md-4">                     
-                  <textarea class="form-control" id="content" name="content"></textarea>
+                  <textarea class="form-control" id="content" name="content" required></textarea>
                 </div>
               </div>
 
@@ -84,6 +131,9 @@
 
               </fieldset>
             </form>
+          <?php            
+          }
+          ?>
 
             
           </div>

@@ -1,3 +1,11 @@
+<?php
+try {
+     $db = new PDO("mysql:host=localhost;dbname=todo;charset=utf8", "root", "");
+} catch ( PDOException $e ){
+     print $e->getMessage();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="tr">
   <head>
@@ -52,10 +60,52 @@
 
           <div class="inner cover">
             <h1 class="cover-heading">List Todo</h1>
-            
-            
+            <?php
+            if ($_GET){
+              if (isset($_GET["islem"])){
+                if ($_GET["islem"] == "sil"){
+                  if (isset($_GET["id"])){
+                    $id = $_GET["id"];
+                    $query_delete = $db->prepare("DELETE FROM list WHERE id = ?");
+                    $delete = $query_delete->execute(array($id));
+                    if($delete){
+                      print '
+                            <div class="alert alert-info alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                              ×
+                            </button>
+                            <h4>
+                              Başarılı!
+                            </h4> <strong>İşlem Başarılı!</strong> Veritabanından '.$id.' numaralı kayıt silindi.
+                          </div>';
+                    }else{
+                      print '
+                            <div class="alert alert-warning alert-dismissable">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                              ×
+                            </button>
+                            <h4>
+                              Hata!
+                            </h4> <strong>İşlem Başarısız!</strong> Veritabanından silme işlemi sırasında hata oluştu. Tekrar Deneyiniz.
+                          </div>';
+                    }
+                  }
+                }
+              }
+            }
 
-            
+            $query_select = $db->query("SELECT * FROM list", PDO::FETCH_ASSOC);
+            if ( $query_select->rowCount() ){
+              print("<table class='table '>");
+              print("<thead><tr><th>Başlık</th><th>#</th></tr></thead><tbody>");
+                 foreach( $query_select as $row ){
+                      print("<tr>");
+                      print("<td>".$row['title']."</td><td><a href='?islem=sil&id=".$row['id']."' class='btn btn-info'>Sil</a></td>");
+                      print("</tr>");
+                 }
+              print("</tbody></table>");
+            }
+            ?>            
           </div>
 
           <div class="mastfoot">
