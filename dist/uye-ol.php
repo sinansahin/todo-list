@@ -1,6 +1,4 @@
 <?php
-session_start();
-ob_start();
 try {
      $db = new PDO("mysql:host=localhost;dbname=todo;charset=utf8", "root", "");
 } catch ( PDOException $e ){
@@ -11,7 +9,6 @@ function make_safe($deger)
    $deger = strip_tags(mysql_real_escape_string(trim($deger)));
    return $deger; 
 }
-if(isset($_SESSION["giris"])){
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -55,20 +52,11 @@ if(isset($_SESSION["giris"])){
 
           <div class="masthead clearfix">
             <div class="inner">
-              <?php
-              if(!isset($_SESSION["giris"])){
-                print('
-                  <h3 class="masthead-brand">Todo List</h3>');
-              }else{
-                print("
-                  <h3 class='masthead-brand'>".$_SESSION["name"]." Todo Lists</h3>"); 
-              }
-              ?>
+              <h3 class="masthead-brand">Todo List</h3>
               <nav>
                 <ul class="nav masthead-nav">
                   <li><a href="index.php">Anasayfa</a></li>
                   <li class="active"><a href="new.php">Yeni Oluştur</a></li>
-                  <li><a href="uye-cikis.php">Çıkış Yap</a></li>
                 </ul>
               </nav>
             </div>
@@ -84,8 +72,8 @@ if(isset($_SESSION["giris"])){
             if (isset($_POST["content"])){
               $content=make_safe($_POST["content"]);
             }
-            $query = $db->prepare("INSERT INTO list SET title = ?, content = ?, uye_id = ?");
-            $insert = $query->execute(array($title, $content, $_SESSION["uid"]));
+            $query = $db->prepare("INSERT INTO list SET title = ?, content = ?");
+            $insert = $query->execute(array($title, $content));
             if ( $insert ){
                 $last_id = $db->lastInsertId();
               
@@ -127,8 +115,8 @@ if(isset($_SESSION["giris"])){
 
               <!-- Textarea -->
               <div class="form-group">
-                <label class="col-md-4 control-label" for="content">İçerik</label>
-                <div class="col-md-4">                     
+                <label class="col-md-5 control-label" for="content">İçerik</label>
+                <div class="col-md-5">                     
                   <textarea class="form-control" id="content" name="content" required></textarea>
                 </div>
               </div>
@@ -153,7 +141,7 @@ if(isset($_SESSION["giris"])){
 
           <div class="mastfoot">
             <div class="inner">
-              <p> &copy; 2015 </p>
+              <p> &copy; 2016 </p>
             </div>
           </div>
 
@@ -173,8 +161,3 @@ if(isset($_SESSION["giris"])){
     <script src="assets/js/ie10-viewport-bug-workaround.js"></script>
   </body>
 </html>
-<?php
-}else{
-  header("Refresh: 0; url=index.php");
-}
-?>

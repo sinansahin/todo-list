@@ -4,6 +4,8 @@ try {
 } catch ( PDOException $e ){
      print $e->getMessage();
 }
+session_start();
+ob_start();
 ?>
 
 <!DOCTYPE html>
@@ -48,11 +50,33 @@ try {
 
           <div class="masthead clearfix">
             <div class="inner">
-              <h3 class="masthead-brand">Todo List</h3>
+            <?php
+              if(!isset($_SESSION["giris"])){
+                print('
+                  <h3 class="masthead-brand">Todo List</h3>');
+              }else{
+                print("
+                  <h3 class='masthead-brand'>".$_SESSION["name"]." Todo Lists</h3>"); 
+              }
+              ?>
               <nav>
                 <ul class="nav masthead-nav">
                   <li class="active"><a href="index.php">Anasayfa</a></li>
-                  <li><a href="new.php">Yeni Oluştur</a></li>
+                  <?php
+                  if(!isset($_SESSION["giris"])){
+                    print('
+                      <li><a href="uye-girisi.php">Üye Girişi</a></li>
+                      <li><a href="uye-ol.php">Üye Ol</a></li>
+                      ');
+                  }else{
+                    print('
+                      <li><a href="new.php">Yeni Oluştur</a></li>
+                      <li><a href="uye-cikis.php">Çıkış Yap</a></li>
+                      ');
+                  }
+                  ?>
+                  
+                  
                 </ul>
               </nav>
             </div>
@@ -61,6 +85,7 @@ try {
           <div class="inner cover">
             <h1 class="cover-heading">List Todo</h1>
             <?php
+            if(isset($_SESSION["giris"])){
             if ($_GET){
               if (isset($_GET["islem"])){
                 if ($_GET["islem"] == "sil"){
@@ -94,7 +119,7 @@ try {
               }
             }
 
-            $query_select = $db->query("SELECT * FROM list", PDO::FETCH_ASSOC);
+            $query_select = $db->query("SELECT * FROM list Where uye_id = '{$_SESSION["uid"]}'", PDO::FETCH_ASSOC);
             if ( $query_select->rowCount() ){
               print("<table class='table '>");
               print("<thead><tr><th>Başlık</th><th>#</th></tr></thead><tbody>");
@@ -105,12 +130,13 @@ try {
                  }
               print("</tbody></table>");
             }
+          }
             ?>            
           </div>
 
           <div class="mastfoot">
             <div class="inner">
-              <p> &copy; 2015 </p>
+              <p> &copy; 2016 </p>
             </div>
           </div>
 

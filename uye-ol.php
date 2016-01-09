@@ -11,7 +11,6 @@ function make_safe($deger)
    $deger = strip_tags(mysql_real_escape_string(trim($deger)));
    return $deger; 
 }
-if(isset($_SESSION["giris"])){
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -55,37 +54,32 @@ if(isset($_SESSION["giris"])){
 
           <div class="masthead clearfix">
             <div class="inner">
-              <?php
-              if(!isset($_SESSION["giris"])){
-                print('
-                  <h3 class="masthead-brand">Todo List</h3>');
-              }else{
-                print("
-                  <h3 class='masthead-brand'>".$_SESSION["name"]." Todo Lists</h3>"); 
-              }
-              ?>
+              <h3 class="masthead-brand">Todo List</h3>
               <nav>
                 <ul class="nav masthead-nav">
                   <li><a href="index.php">Anasayfa</a></li>
-                  <li class="active"><a href="new.php">Yeni Oluştur</a></li>
-                  <li><a href="uye-cikis.php">Çıkış Yap</a></li>
+                  <li><a href="uye-girisi.php">Üye Girişi</a></li>
+                  <li class="active"><a href="uye-ol.php">Üye Ol</a></li>
                 </ul>
               </nav>
             </div>
           </div>
 
           <div class="inner cover">
-            <h1 class="cover-heading">New Todo</h1>
+            <h1 class="cover-heading">Üye Girişi</h1>
           <?php
           if ($_POST){
-            if (isset($_POST["title"])){
-              $title=make_safe($_POST["title"]);
+            if (isset($_POST["name"])){
+              $name=make_safe($_POST["name"]);
             }
-            if (isset($_POST["content"])){
-              $content=make_safe($_POST["content"]);
+            if (isset($_POST["email"])){
+              $email=make_safe($_POST["email"]);
             }
-            $query = $db->prepare("INSERT INTO list SET title = ?, content = ?, uye_id = ?");
-            $insert = $query->execute(array($title, $content, $_SESSION["uid"]));
+            if (isset($_POST["password"])){
+              $password=make_safe($_POST["password"]);
+            }
+            $query = $db->prepare("INSERT INTO uye SET name = ?, email = ?, password = ?");
+            $insert = $query->execute(array($name, $email, $password));
             if ( $insert ){
                 $last_id = $db->lastInsertId();
               
@@ -96,7 +90,7 @@ if(isset($_SESSION["giris"])){
                 </button>
                 <h4>
                   Başarılı!
-                </h4> <strong>İşlem Başarılı!</strong> Veritabanına kayıt işlemi gerçekleştirildi.
+                </h4> <strong>İşlem Başarılı!</strong> Buradan <a href="uye-girisi.php">giriş</a> yapabilirsiniz.
               </div>';
             }
             else{
@@ -118,18 +112,25 @@ if(isset($_SESSION["giris"])){
               
               <!-- Text input-->
               <div class="form-group">
-                <label class="col-md-4 control-label" for="title">Başlık</label>  
+                <label class="col-md-4 control-label" for="email">Ad Soyad</label>  
                 <div class="col-md-5">
-                <input id="title" name="title" type="text" placeholder="" class="form-control input-md" required>
+                <input id="name" name="name" type="text" placeholder="" class="form-control input-md" required>
+                  
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-md-4 control-label" for="email">E-mail</label>  
+                <div class="col-md-5">
+                <input id="email" name="email" type="email" placeholder="" class="form-control input-md" required>
                   
                 </div>
               </div>
 
               <!-- Textarea -->
               <div class="form-group">
-                <label class="col-md-4 control-label" for="content">İçerik</label>
-                <div class="col-md-4">                     
-                  <textarea class="form-control" id="content" name="content" required></textarea>
+                <label class="col-md-4 control-label" for="password">Password</label>
+                <div class="col-md-5">                     
+                  <input id="password" name="password" type="password" placeholder="" class="form-control input-md" required>
                 </div>
               </div>
 
@@ -137,7 +138,7 @@ if(isset($_SESSION["giris"])){
               <div class="form-group">
                 <label class="col-md-4 control-label" for="submit"></label>
                 <div class="col-md-8">
-                  <button id="submit" name="submit" class="btn btn-success">Kaydet</button>
+                  <button id="submit" name="submit" class="btn btn-success">Gönder</button>
                   <button id="reset" name="reset" class="btn btn-info">Temizle</button>
                 </div>
               </div>
@@ -153,7 +154,7 @@ if(isset($_SESSION["giris"])){
 
           <div class="mastfoot">
             <div class="inner">
-              <p> &copy; 2015 </p>
+              <p> &copy; 2016 </p>
             </div>
           </div>
 
@@ -173,8 +174,3 @@ if(isset($_SESSION["giris"])){
     <script src="assets/js/ie10-viewport-bug-workaround.js"></script>
   </body>
 </html>
-<?php
-}else{
-  header("Refresh: 0; url=index.php");
-}
-?>
